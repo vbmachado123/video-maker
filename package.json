@@ -17,8 +17,10 @@
   },
   "homepage": "https://github.com/vbmachado123/video-maker#readme",
   "dependencies": {
+    "algorithmia": "^0.3.10",
     "binary-extensions": "^2.0.0",
-    "readline-sync": "^1.4.10"
+    "readline-sync": "^1.4.10",
+    "sbd": "^1.0.18"
   },
   "devDependencies": {}
 }

@@ -22,6 +22,7 @@
     "express": "^4.17.1",
     "googleapis": "^49.0.0",
     "ibm-watson": "^5.5.0",
+    "image-downloader": "^3.5.0",
     "parse-domain": "^3.0.1",
     "readline-sync": "^1.4.10",
     "sbd": "^1.0.18"

@@ -104,3 +104,6 @@ dist
 .tern-port
 
 content.json
+content/*.png
+content/*.jpg
+content/*.jpeg

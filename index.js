@@ -4,10 +4,13 @@ const robots = {
 	text: require('./robots/text.js'),
 	state: require('./robots/state.js'),
 	image: require('./robots/image.js')
+
 }
 
 async function start() {
-	 robots.input()
+	//console.log('> Starting...')
+
+	robots.input()
 	await robots.text()
 	await robots.image()
 

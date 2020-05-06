@@ -2,25 +2,25 @@ const readline = require('readline-sync')
 const state = require('./state.js')
 
 function robot() {
-	  const content = {
-		      maximumSentences: 7
-		    }
+    const content = {
+        maximumSentences: 7
+    }
 
-	  content.searchTerm = askAndReturnSearchTerm()
-	  content.prefix = askAndReturnPrefix()
-	  state.save(content)
+    content.searchTerm = askAndReturnSearchTerm()
+    content.prefix = askAndReturnPrefix()
+    state.save(content)
 
-	  function askAndReturnSearchTerm() {
-		      return readline.question('Type a Wikipedia search term: ')
-		    }
+    function askAndReturnSearchTerm() {
+        return readline.question('Digite um termo de pesquisa da Wikipedia: ')
+    }
 
-	  function askAndReturnPrefix() {
-		      const prefixes = ['Who is', 'What is', 'The history of']
-		      const selectedPrefixIndex = readline.keyInSelect(prefixes, 'Choose one option: ')
-		      const selectedPrefixText = prefixes[selectedPrefixIndex]
+    function askAndReturnPrefix() {
+        const prefixes = ['Quem e', 'O que e', 'A historia de']
+        const selectedPrefixIndex = readline.keyInSelect(prefixes, 'Escolha uma opcao: ')
+        const selectedPrefixText = prefixes[selectedPrefixIndex]
 
-		      return selectedPrefixText
-		    }
+        return selectedPrefixText
+    }
 }
 
 module.exports = robot

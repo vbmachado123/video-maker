@@ -107,3 +107,5 @@ content.json
 content/*.png
 content/*.jpg
 content/*.jpeg
+content/*.mp4
+content/*.mov

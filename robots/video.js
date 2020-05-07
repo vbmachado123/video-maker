@@ -1,21 +1,14 @@
-const state = require('./state.js')
-const path = require('path')
-const rootPath = path.resolve(__dirname, '..')
-const fromRoot = relPath => path.resolve(rootPath, relPath)
 const gm = require('gm').subClass({ imageMagick: true })
-const videoshow = require('videoshow')
-const ffmpegPath = require('@ffmpeg-installer/ffmpeg').path
-const ffprobePath = require('@ffprobe-installer/ffprobe').path
-let ffmpeg = require('fluent-ffmpeg')
-ffmpeg.setFfmpegPath(ffmpegPath)
-ffmpeg.setFfprobePath(ffprobePath)
-
+const state = require('./state.js')
 const spawn = require('child_process').spawn
+const path = require('path')
+const os = require('os');
+const rootPath = path.resolve(__dirname, '..')
 
-const jimp = require('jimp')
+const fromRoot = relPath => path.resolve(rootPath, relPath)
 
 async function robot() {
-    console.log('> [video-robot] Starting...')
+    console.log('> [robô-video] Iniciando...')
 
     const content = state.load()
     await convertAllImages(content)
@@ -28,7 +21,7 @@ async function robot() {
 
     async function convertAllImages(content) {
         for (let sentenceIndex = 0; sentenceIndex < content.sentences.length; sentenceIndex++) {
-            convertImage(sentenceIndex)
+            await convertImage(sentenceIndex)
         }
     }
 
@@ -39,16 +32,33 @@ async function robot() {
             const width = 1920
             const height = 1080
 
-            jimp.read(inputFile)
-                .then(newImg => {
-                    console.log(`> [video-robot] Image converted: ${outputFile}`)
-                    newImg
-                        .resize(width, height) //resize
-                        .quality(60) //set JPEG quality
-                        .write(outputFile)
-                }).catch(err => {
-                    console.error(`> [video-robot] Erro: ${err}`)
-                    throw new Error(err)
+            gm()
+                .in(inputFile)
+                .out('(')
+                .out('-clone')
+                .out('0')
+                .out('-background', 'white')
+                .out('-blur', '0x9')
+                .out('-resize', `${width}x${height}^`)
+                .out(')')
+                .out('(')
+                .out('-clone')
+                .out('0')
+                .out('-background', 'white')
+                .out('-resize', `${width}x${height}`)
+                .out(')')
+                .out('-delete', '0')
+                .out('-gravity', 'center')
+                .out('-compose', 'over')
+                .out('-composite')
+                .out('-extent', `${width}x${height}`)
+                .write(outputFile, (error) => {
+                    if (error) {
+                        return reject(error)
+                    }
+
+                    console.log(`> [robô-video] Imagem convertida: ${outputFile}`)
+                    resolve()
                 })
         })
     }
@@ -92,36 +102,34 @@ async function robot() {
                 gravity: 'center'
             }
         }
-
-        //0x0 - gera imagem com fundo transparente
-        new jimp(1920, 1080, 0x0, (err, newImg) => {
-            // this image is 256 x 256, every pixel is set to #FF00FF
-            jimp.loadFont(jimp.FONT_SANS_128_WHITE).then(font => {
-                console.log(`> [video-robot] Sentence created: ${outputFile}`)
-                newImg
-                    .print(font, 10, 10, {
-                            text: sentenceText,
-                            alignmentX: jimp.HORIZONTAL_ALIGN_CENTER,
-                            alignmentY: jimp.VERTICAL_ALIGN_MIDDLE
-                        },
-                        1920,
-                        1080
-                    )
-                    .write(outputFile);
-            });
-        });
+        gm()
+            .out('-size', templateSettings[sentenceIndex].size)
+            .out('-gravity', templateSettings[sentenceIndex].gravity)
+            .out('-background', 'transparent')
+            .out('-fill', 'white')
+            .out('-kerning', '-1')
+            .out(`caption:${sentenceText}`)
+            .write(outputFile, (error) => {
+                if (error) {
+                    return reject(error)
+                }
+                console.log(`> [robô-video] Sentenca criada: ${outputFile}`)
+            })
     }
 
     async function createYoutubeThumbnail(content) {
-        jimp.read('./content/0-original.png')
-            .then(thumbnail => {
-                console.log('> [video-robot] Creating Youtube thumbnail')
-                return thumbnail
-                    .write('./content/youtube-thumbnail.jpg')
-            })
-            .catch(err => {
-                console.error(`> [video-robot] Erro: ${err}`)
-            })
+        return new Promise((resolve, reject) => {
+            gm()
+                .in(fromRoot('./content/0-converted.png'))
+                .write(fromRoot('./content/youtube-thumbnail.jpg'), (error) => {
+                    if (error) {
+                        return reject(error)
+                    }
+
+                    console.log('> [robô-video] Thumbnail para o YouTube criada')
+                    resolve()
+                })
+        })
     }
 
     async function createAfterEffectsScript(content) {
@@ -134,7 +142,7 @@ async function robot() {
             const templateFilePath = `${rootPath}/templates/1/template.aep`
             const destinationFilePath = `${rootPath}/content/output.mov`
 
-            console.log('> [video-robot] Starting After Effects')
+            console.log('> [robô-video] Iniciando After Effects')
 
             const aerender = spawn(aerenderFilePath, [
                 '-comp', 'main',
@@ -147,7 +155,7 @@ async function robot() {
             })
 
             aerender.on('close', () => {
-                console.log('> [video-robot] After Effects closed')
+                console.log('> [robô-video] After Effects foi encerrado')
                 resolve()
             })
         })

@@ -6,7 +6,6 @@ const robots = {
     image: require('./robots/image.js'),
     video: require('./robots/video.js'),
     youtube: require('./robots/youtube.js')
-
 }
 
 async function start() {

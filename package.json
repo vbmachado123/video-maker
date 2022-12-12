@@ -21,7 +21,7 @@
     "@ffprobe-installer/ffprobe": "^1.0.12",
     "algorithmia": "^0.3.10",
     "binary-extensions": "^2.0.0",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "ffmpeg": "0.0.4",
     "gm": "^1.23.1",
     "googleapis": "^49.0.0",
